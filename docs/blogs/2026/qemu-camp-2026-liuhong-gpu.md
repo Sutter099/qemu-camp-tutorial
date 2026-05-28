@@ -8,13 +8,13 @@
 
 ## 背景介绍
 
-上海某学校大数据技术与工程研二学生，对系统编程感兴趣，希望通过QEMU训练营寻找一些idea，并且掌握一些CPU、GPU和模拟器的知识。
+上海某学校大数据技术与工程研二学生，对系统编程感兴趣，希望通过 QEMU 训练营寻找一些 idea，并且掌握一些 CPU、GPU 和模拟器的知识。
 
 ---
 
 ## 专业阶段
 
-完成了GPU方向实验。
+完成了 GPU 方向实验。
 
 ### GPU 实验理解概述
 
@@ -22,15 +22,15 @@
 
 ### 实验内容
 
-17道测试覆盖了：设备识别、全局控制、VRAM访问、DMA传输、中断模拟、SIMT上下文与调度、kernel执行、低精度浮点数格式转换。
+17 道测试覆盖了：设备识别、全局控制、VRAM 访问、DMA 传输、中断模拟、SIMT 上下文与调度、kernel 执行、低精度浮点数格式转换。
 
 以执行指令的全流程为脉络，串联实验。
 
-**阶段1：QEMU设备注册与初始化**
+**阶段 1：QEMU 设备注册与初始化**
 
-1.1 `gpgpu.c` 中执行 `type_init()` 方法将gpu这个类型注册到类型系统，父类为 `TYPE_PCI_DEVICE`。
+1.1 `gpgpu.c` 中执行 `type_init()` 方法将 gpu 这个类型注册到类型系统，父类为 `TYPE_PCI_DEVICE`。
 
-1.2 基于QOM的面向对象思想，调用 `gpgpu_class_init` 进行类初始化。
+1.2 基于 QOM 的面向对象思想，调用 `gpgpu_class_init` 进行类初始化。
 
 1.3 QEMU 命令行指定 `-device gpgpu` 时，会调用 `gpgpu_realize()`。
 
@@ -70,11 +70,11 @@ static void gpgpu_realize(PCIDevice *pdev, Error **errp)
 
 例如 Guest CPU 读写 BAR0 地址时，QEMU 会通过 `MemoryRegionOps`（即 `gpgpu_ctrl_ops`）自动调用回调函数 `gpgpu_ctrl_read/write`，传入 **BAR 内部偏移量** 和 **设备状态指针**。
 
-**阶段2：Guest 内核驱动初始化，进行 PCIe 设备发现/Probe。**
+**阶段 2：Guest 内核驱动初始化，进行 PCIe 设备发现/Probe。**
 
-**阶段3：用户态程序准备数据。**
+**阶段 3：用户态程序准备数据。**
 
-**阶段4：写 `GPGPU_REG_DISPATCH` 寄存器触发执行，对应实验4。**
+**阶段 4：写 `GPGPU_REG_DISPATCH` 寄存器触发执行，对应实验 4。**
 
 4.1 调用 `gpgpu_dispatch_kernel`，再调用
 ```c
@@ -129,7 +129,7 @@ void gpgpu_core_init_warp(GPGPUWarp *warp, uint32_t pc, uint64_t kernel_args,
 
 4.3 执行每个 warp，核心方法是 `decode_and_exec`。
 
-**阶段5：译码 (decode)**
+**阶段 5：译码 (decode)**
 
 ```c
 static inline void decode_and_exec(GPGPUState *s, GPGPULane *lane, uint32_t inst)
@@ -159,7 +159,7 @@ static inline void decode_and_exec(GPGPUState *s, GPGPULane *lane, uint32_t inst
 
 译码过程中使用了相当多的 `switch case` 语句，单纯堆代码不是好的选择。
 
-**阶段6：执行 (execute)**
+**阶段 6：执行 (execute)**
 
 6.1 模拟 `flw` 指令执行过程中，GPGPU 访问 VRAM 直接使用 `memcpy`。模拟 Host 访问 VRAM 的 DMA 数据搬运则通过 `MemoryRegionOps` 中的回调函数完成。
 
@@ -231,7 +231,7 @@ case 1: {
 break;
 ```
 
-**阶段7：所有 warp 执行完后，返回 `gpgpu_dispatch_kernel` 方法，调用 `msix_notify`，向 Guest 注入 MSI-X 中断。**
+**阶段 7：所有 warp 执行完后，返回 `gpgpu_dispatch_kernel` 方法，调用 `msix_notify`，向 Guest 注入 MSI-X 中断。**
 
 ---
 
